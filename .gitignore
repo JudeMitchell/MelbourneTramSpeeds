@@ -1,4 +1,8 @@
 pdfminer-20140328
 HTMLS
 PDFS
+GOALS
+stop_comparison_csvs
 .DS_Store
+.Rproj.user
+TopDownBottomUp
