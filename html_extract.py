@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 import re
-# from sys import argv
+from sys import argv
 from my_functions import *
 import csv
 
@@ -10,15 +10,15 @@ stop_name_regex = r'\d{1,3}-[A-Z][A-z\s\n/]+\([A-Z][A-z\s\n]+\)'
 # todo - read these in from a csv
 # stop1 = '1-University of Melbourne/Swanston St (Carlton)'
 # stop2 = '14-Arts Centre/St Kilda Rd (Southbank)'
-html2010 = "./HTMLS/2010Route1.html"
-html2015 = "./HTMLS/2015Route1.html"
+html2010 = argv[1]
+html2015 = argv[2]
 htmls = [html2010, html2015]
 compare_csv = "stop_comparison_csvs/compare_stops_" + str(re.search(r'Route\d{1,3}', html2010).group(0)) + ".csv"
 
 ## DIRECTIONS
 # todo - scrape these out
-direction1 = "East Coburg to South Melbourne"
-direction2 = "South Melbourne to East Coburg"
+# direction1 = "East Coburg to South Melbourne"
+# direction2 = "South Melbourne to East Coburg"
 
 stops2010 = []
 stops2015 = []
