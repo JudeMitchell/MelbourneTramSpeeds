@@ -22,22 +22,29 @@ def take_longest_lists(raw_lists, top_rows):
 	return clean_lists
 
 
-def extract_stops_list(tags):
-	stop_name_regex = r'\d{1,3}-[A-Z][A-z\s\n/]+\([A-Z][A-z\s\n]+\)'
+def compare_stop_lists(stopsA, stopsB, html2010, direction):
+	import re
+	import csv
 
-	for i in range(len(tags)):
-		contains_stops = re.search(stop_name_regex, str(tags[i]))
-		if contains_stops:
-			stops_tags.append(str(tags[j]))
-			print str(tags[j])
-			stops_tag_num = j
-			break
+	stops_intersect = []
+	for stop in stopsA:
+		if stop in stopsB:
+			stops_intersect.append(stop)
 
-	stops_tag = str(tags[stops_tag_num])
-	stops_tag = stops_tag.replace('<br>', '')
-	stops_tag = stops_tag.replace('\n', ' ')
+	if len(stopsA) != len(stopsB):
+		if len(stopsA) > len(stopsB):	
+			stopsB = stopsB + ([""] * (len(stopsA) - len(stopsB)))
+		else:
+			stopsA = stopsA + ([""] * (len(stopsB) - len(stopsA)))
 
-	number_stops = len(re.findall(r'\d{1,3}-[A-Z]', stops_tag))
-	stop_names = re.findall(stop_name_regex, stops_tag)
+	stops_intersect = list(stops_intersect) + ([""] * (len(stopsA) - len(stops_intersect)))
 
-	return stop_names
+	compare_csv = "stop_comparison_csvs/compare_stops_" + str(re.search(r'Route\d{1,3}', html2010).group(0)) + "_" + direction + ".csv"
+	compare_csv_file = open(compare_csv, "wb")
+	csv_writer = csv.writer(compare_csv_file, delimiter=",")
+	csv_writer.writerow(['Matched Segment List', '2010', '2015'])
+
+	for i in range(len(stopsA)):
+		csv_writer.writerow([stops_intersect[i], stopsA[i], stopsB[i]])
+
+	compare_csv_file.close()
