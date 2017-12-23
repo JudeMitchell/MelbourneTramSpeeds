@@ -7,49 +7,122 @@ import csv
 time_regex = r'\d{1,2}:\d{2}'
 stop_name_regex = r'\d{1,3}-[A-Z][A-z\s\n/]+\([A-Z][A-z\s\n]+\)'
 
-# todo - read these in from a csv
-# stop1 = '1-University of Melbourne/Swanston St (Carlton)'
-# stop2 = '14-Arts Centre/St Kilda Rd (Southbank)'
 html2010 = argv[1]
 html2015 = argv[2]
 htmls = [html2010, html2015]
-compare_csv = "stop_comparison_csvs/compare_stops_" + str(re.search(r'Route\d{1,3}', html2010).group(0)) + ".csv"
+# compare_csv = "stop_comparison_csvs/compare_stops_" + str(re.search(r'Route\d{1,3}', html2010).group(0)) + ".csv"
 
-## DIRECTIONS
-# todo - scrape these out
-# direction1 = "East Coburg to South Melbourne"
-# direction2 = "South Melbourne to East Coburg"
+stops = []
+directions = []
+stops_tags = []
 
-stops2010 = []
-stops2015 = []
-stops = [stops2010, stops2015]
+error_log = open('error_log.txt', 'w')
 
 for i in range(len(htmls)):
 	content = open(htmls[i], 'r')
 	soup = BeautifulSoup(content.read(), "html.parser")
 	tags = soup.find_all(["br", "span"])
-	span_tags = soup.find_all("span")
+	# span_tags = soup.find_all("span")
+
+	doc_directions = []
+	doc_directions_tag_numbers = []
+
+	for i in range(len(tags)):
+		if re.search(r"[A-z ]+ to [A-z ]+", str(tags[i])):
+			if not re.search('(day|[Ww]eek|times)', str(tags[i])):
+				doc_directions.append(str(tags[i].contents[0]).replace('\n', ''))
+				doc_directions_tag_numbers.append(i)
+
+	doc_directions = [doc_directions[0], doc_directions[-1]]
+	directions.append(doc_directions)
 
 	for j in range(len(tags)):
-		contains_stops = re.search(stop_name_regex, str(tags[j]))
-		if contains_stops:
-			stops_tag_num = j
+		contains_stopsA = re.search(stop_name_regex, str(tags[j]))
+		if contains_stopsA:
+			stops_tags.append(str(tags[j]))
+			stops_tag_numA = j
 			break
 
-	stops_tag = str(tags[stops_tag_num])
-	stops_tag = stops_tag.replace('<br>', '')
-	stops_tag = stops_tag.replace('\n', ' ')
+	for k in range(doc_directions_tag_numbers[int(round(len(doc_directions_tag_numbers),0)/2+2)], len(tags)):
+		contains_stopsB = re.search(stop_name_regex, str(tags[k]))
+		if contains_stopsB:
+			stops_tags.append(str(tags[k]))
+			stops_tag_numB = k
+			break
 
-	number_stops = len(re.findall(r'\d{1,3}-[A-Z]', stops_tag))
-	stop_names = re.findall(stop_name_regex, stops_tag)
+	stops_tagA = str(tags[stops_tag_numA])
+	stops_tagA = stops_tagA.replace('<br>', '')
+	stops_tagA = stops_tagA.replace('\n', ' ')
+	stops_tagB = str(tags[stops_tag_numB])
+	stops_tagB = stops_tagB.replace('<br>', '')
+	stops_tagB = stops_tagB.replace('\n', ' ')
 
-	stops[i] = stop_names
+	# number_stops = len(re.findall(r'\d{1,3}-[A-Z]', stops_tag))
+	stop_namesA = re.findall(stop_name_regex, stops_tagA)
+	stop_namesB = re.findall(stop_name_regex, stops_tagB)
 
-start_suburb2010 = re.search(r"\([A-z ]+\)", stops[0][0]).group(0)
-start_suburb2015 = re.search(r"\([A-z ]+\)", stops[1][0]).group(0)
 
-if start_suburb2010 != start_suburb2015:
-	stops[1].reverse()
+	stops.append(stop_namesA)
+	stops.append(stop_namesB)
+
+# DETERMINE ORDERS OF DIRECTIONS
+print '***************************'
+print '******** TEST AREA ********'
+print '***************************'
+
+for i in range(len(stops_tags)):
+	print "\t" + str(i)
+	print stops_tags[i]
+quit()
+
+directions_lists = [[re.search(r'([A-z ]+) to ([A-z ]+)', directions[0][0]).group(1), 
+					re.search(r'([A-z ]+) to ([A-z ]+)', directions[0][0]).group(2)], 
+					[re.search(r'([A-z ]+) to ([A-z ]+)', directions[1][0]).group(1),
+					re.search(r'([A-z ]+) to ([A-z ]+)', directions[1][0]).group(2)]]
+
+if directions_lists[0][0] == directions_lists[1][0]:
+	order_matching = "FIRST AND FIRST"
+	directionA_stops2010 = extract_stops_list()
+	directionB_stops2010 = extract_stops_list()
+	directionA_stops2015 = extract_stops_list()
+	directionB_stops2015 = extract_stops_list()
+
+elif directions_lists[0][0] == directions_lists[1][1]:
+	order_matching = "FIRST AND SECOND"
+
+elif directions_lists[0][1] == directions_lists[1][0]:	
+	order_matching = "SECOND AND FIRST"
+
+elif directions_lists[0][1] == directions_lists[1][1]:
+	order_matching = "SECOND AND SECOND"
+else:
+	#TODO print route names to a spreadsheet with cannot determine directions warning
+	print "*** CANNOT IDENTIFY ROUTE DIRECTION MATCH FOR " + str(html2010) + " AND " + str(html2015) + "!!****"
+	error_log.write("Cannot identify route direction match for " + html2010 + " and " + html2015)
+
+print order_matching
+
+for i in range(doc_directions_tag_numbers[-1], 15000):
+	contains_stops_later = re.search(stop_name_regex, str(tags[i]))
+	if contains_stops_later:
+		# stops_tags.append(str(tags[j]))
+		print 'LATER**************'
+		print i
+		print str(tags[i])
+
+
+
+print '***************************'
+print '*********** END ***********'
+print '***************************'
+
+quit()
+
+# start_suburb2010 = re.search(r"\([A-z ]+\)", stops[0][0]).group(0)
+# start_suburb2015 = re.search(r"\([A-z ]+\)", stops[1][0]).group(0)
+
+# if start_suburb2010 != start_suburb2015:
+# 	stops[1].reverse()
 
 stops_intersect = (set(stops[0]) & set(stops[1]))
 
@@ -69,7 +142,7 @@ for i in range(len(stops[0])):
 	csv_writer.writerow([stops_intersect[i], stops[0][i], stops[1][i]])
 
 compare_csv_file.close()
-
+error_log.close()
 
 
 # possible_directions = []

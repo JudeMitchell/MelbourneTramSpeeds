@@ -5,4 +5,5 @@ GOALS
 stop_comparison_csvs
 .DS_Store
 .Rproj.user
+error_log.txt
 TopDownBottomUp
