@@ -6,10 +6,10 @@ from my_functions import *
 time_regex = r'\d{1,2}:\d{2}'
 stop_name_regex = r'\d{1,3}-[A-Z][A-z\s\n/]+\([A-Z][A-z\s\n]+\)'
 
-html2010 = argv[1]
-html2015 = argv[2]
-htmls = [html2010, html2015]
-compare_csv = "stop_comparison_csvs/compare_stops_" + str(re.search(r'Route\d{1,3}', html2010).group(0)) + ".csv"
+html_year1 = argv[1]
+html_year2 = argv[2]
+htmls = [html_year1, html_year2]
+compare_csv = "stop_comparison_csvs/compare_stops_" + str(re.search(r'Route\d{1,3}', html_year1).group(0)) + ".csv"
 
 stops = []
 directions = []
@@ -69,25 +69,25 @@ directions_lists = [[re.search(r'([A-z ]+) to ([A-z ]+)', directions[0][0]).grou
 
 if directions_lists[0][0] == directions_lists[1][0]:
 	order_matching = "FIRST AND FIRST"
-	compare_stop_lists(stops[0], stops[2], html2010, directions[0][0])
-	compare_stop_lists(stops[1], stops[3], html2010, directions[0][1])
+	compare_stop_lists(stops[0], stops[2], html_year1, directions[0][0])
+	compare_stop_lists(stops[1], stops[3], html_year1, directions[0][1])
 
 elif directions_lists[0][0] == directions_lists[1][1]:
 	order_matching = "FIRST AND SECOND"
-	compare_stop_lists(stops[0], stops[3], html2010, directions[0][0])
-	compare_stop_lists(stops[1], stops[2], html2010, directions[0][1])
+	compare_stop_lists(stops[0], stops[3], html_year1, directions[0][0])
+	compare_stop_lists(stops[1], stops[2], html_year1, directions[0][1])
 
 elif directions_lists[0][1] == directions_lists[1][0]:	
 	order_matching = "SECOND AND FIRST"
-	compare_stop_lists(stops[1], stops[2], html2010, directions[0][1])
-	compare_stop_lists(stops[0], stops[3], html2010, directions[0][0])
+	compare_stop_lists(stops[1], stops[2], html_year1, directions[0][1])
+	compare_stop_lists(stops[0], stops[3], html_year1, directions[0][0])
 
 elif directions_lists[0][1] == directions_lists[1][1]:
 	order_matching = "SECOND AND SECOND"
-	compare_stop_lists(stops[1], stops[3], html2010, directions[0][1])
-	compare_stop_lists(stops[0], stops[2], html2010, directions[0][0])
+	compare_stop_lists(stops[1], stops[3], html_year1, directions[0][1])
+	compare_stop_lists(stops[0], stops[2], html_year1, directions[0][0])
 else:
-	print "*** CANNOT IDENTIFY ROUTE DIRECTION MATCH FOR " + str(html2010) + " AND " + str(html2015) + "!!****"
-	error_log.write("Cannot identify route direction match for " + html2010 + " and " + html2015)
+	print "*** CANNOT IDENTIFY ROUTE DIRECTION MATCH FOR " + str(html_year1) + " AND " + str(html_year2) + "!!****"
+	error_log.write("Cannot identify route direction match for " + html_year1 + " and " + html_year2)
 
 error_log.close()
