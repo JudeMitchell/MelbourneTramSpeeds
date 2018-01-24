@@ -1,42 +1,71 @@
-# for i in range(doc_directions_tag_numbers[-1], 15000):
-# 	contains_stops_later = re.search(stop_name_regex, str(tags[i]))
-# 	if contains_stops_later:
-# 		# stops_tags.append(str(tags[j]))
-# 		print 'LATER**************'
-# 		print i
-# 		print str(tags[i])
+route_number = "1"
+year1 = "2010"
+year2 = "2015"
 
+north_direction = "South Melbourne to East Coburg"
+north_stops = {
+	'stopa_year1' : "",
+	'stopa_year2' : "",
+	'stopb_year1' : "",
+	'stopb_year2' : "",
+}
 
+south_direction = "East Coburg to South Melbourne"
+south_stops = {
+	'stopa_year1' : "",
+	'stopa_year2' : "",
+	'stopb_year1' : "",
+	'stopb_year2' : "",
+}
 
-# print '***************************'
-# print '*********** END ***********'
-# print '***************************'
+html_year1 = open("./HTMLS/" + year1 + "Route" + route_number + ".html", 'r')
+html_year2 = open("./HTMLS/" + year2 + "Route" + route_number + ".html", 'r')
 
+htmls = [html_year1, html_year2]
+both_tags = []
 
-# start_suburb2010 = re.search(r"\([A-z ]+\)", stops[0][0]).group(0)
-# start_suburb2015 = re.search(r"\([A-z ]+\)", stops[1][0]).group(0)
+for i in range(len(htmls)):
+	tags = soup.find_all(["br", "span"])
 
-# if start_suburb2010 != start_suburb2015:
-# 	stops[1].reverse()
+	doc_directions = []
+	doc_directions_tag_numbers = []
 
-# stops_intersect = (set(stops[0]) & set(stops[1]))
+	for i in range(len(tags)):
+		if re.search(r"[A-z ]+ to [A-z ]+", str(tags[i])):
+			if not re.search('(day|times)', str(tags[i])):
+				doc_directions.append(str(tags[i].contents[0]).replace('\n', ''))
+				doc_directions_tag_numbers.append(i)
 
-# if len(stops[0]) != len(stops[1]):
-# 	if len(stops[0]) > len(stops[1]):	
-# 		stops[1] = stops[1] + ([""] * (len(stops[0]) - len(stops[1])))
-# 	else:
-# 		stops[0] = stops[0] + ([""] * (len(stops[1]) - len(stops[0])))
+	doc_directions = [doc_directions[0], doc_directions[-1]]
+	directions.append(doc_directions)
 
-# stops_intersect = list(stops_intersect) + ([""] * (len(stops[0]) - len(stops_intersect)))
+	for j in range(len(tags)):
+		contains_stopsA = re.search(stop_name_regex, str(tags[j]))
+		if contains_stopsA:
+			stops_tags.append(str(tags[j]))
+			stops_tag_numA = j
+			break
 
-# compare_csv_file = open(compare_csv, "wb")
-# csv_writer = csv.writer(compare_csv_file, delimiter=",")
-# csv_writer.writerow(['Matched Segment List', '2010', '2015'])
+	for k in range(doc_directions_tag_numbers[int(round(len(doc_directions_tag_numbers),0)/2+2)], len(tags)):
+		contains_stopsB = re.search(stop_name_regex, str(tags[k]))
+		if contains_stopsB:
+			stops_tags.append(str(tags[k]))
+			stops_tag_numB = k
+			break
 
-# for i in range(len(stops[0])):
-# 	csv_writer.writerow([stops_intersect[i], stops[0][i], stops[1][i]])
+	stops_tagA = str(tags[stops_tag_numA]) 
 
-# compare_csv_file.close()
+	stops_tagA = stops_tagA.replace('\n', ' ')
+	stops_tagA = stops_tagA.replace('<br>', '')
+	stops_tagB = str(tags[stops_tag_numB]) 
+	stops_tagB = stops_tagB.replace('\n', ' ')
+	stops_tagB = stops_tagB.replace('<br>', '')
+
+	stop_namesA = re.findall(stop_name_regex, stops_tagA)
+	stop_namesB = re.findall(stop_name_regex, stops_tagB)
+
+	stops.append(stop_namesA)
+	stops.append(stop_namesB)
 
 
 

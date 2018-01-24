@@ -22,10 +22,10 @@ cat html_file_names.txt | while read html_file_name
 do
 	if [ "${html_file_name:0:4}" = "2010" ]
 	then
-		grep -q "2015Route${html_file_name:9}$" html_file_names.txt                                                                 
+		grep -q "$2Route${html_file_name:9}$" html_file_names.txt                                                                 
 	    if [ $? -eq 0 ] ; then
 	        echo ${html_file_name:9}
-	        python compare_route_stops.py 	"./HTMLS/2010Route${html_file_name:9}.html" "./HTMLS/2015Route${html_file_name:9}.html" 
+	        python compare_route_stops.py 	"./HTMLS/$1Route${html_file_name:9}.html" "./HTMLS/$2Route${html_file_name:9}.html" 
 		fi
 	fi
 done
